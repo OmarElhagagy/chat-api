@@ -6,7 +6,7 @@ scrape_configs:
   - job_name: 'chat-api'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['chat-api-1:8000', 'chat-api-2:8000', 'chat-api-3:8000']
+      - targets: ['api1:8000', 'api2:8000', 'api3:8000']
 
   - job_name: 'nginx'
     static_configs:

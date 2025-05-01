@@ -5,7 +5,6 @@ from prometheus_client import make_asgi_app
 from contextlib import asynccontextmanager
 import logging
 import uvicorn
-
 from .api.auth import router as auth_router
 from .api.chat import router as chat_router
 from .api.websocket import router as websocket_router
@@ -22,11 +21,30 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code
+    logger.info("Connecting to database...")
+    await db.connect()
+    logger.info("Database connection established")
+    
+    try:
+        cache.client.ping()
+        logger.info("Redis connection established")
+    except Exception as e:
+        logger.error(f"Failed to connect to Redis: {e}")
+    yield  # Server runs here
+    # Shutdown code
+    logger.info("Closing database connection...")
+    await db.disconnect()
+    logger.info("Database connection closed")
+
+# Create single FastAPI app with all parameters
 app = FastAPI(
     title="Scalable Chat API",
     description="A scalable chat API with load balancing and caching",
     version="1.0.0",
+    lifespan=lifespan
 )
 
 # Setup metrics
@@ -51,33 +69,10 @@ app.add_middleware(MetricsMiddleware)
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-# routers
+# Include all routers
 app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(chat_router, prefix="/api/chat", tags=["Chat"])
 app.include_router(websocket_router, tags=["WebSocket"])
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup code
-    logger.info("Connecting to database...")
-    await db.connect()
-    logger.info("Database connection established")
-    
-    try:
-        cache.client.ping()
-        logger.info("Redis connection established")
-    except Exception as e:
-        logger.error(f"Failed to connect to Redis: {e}")
-
-    yield  # Server runs here
-
-    # Shutdown code
-    logger.info("Closing database connection...")
-    await db.disconnect()
-    logger.info("Database connection closed")
-
-app = FastAPI(lifespan=lifespan)
 
 @app.get("/health")
 async def health_check():

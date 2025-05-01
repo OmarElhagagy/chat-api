@@ -1,5 +1,6 @@
 from prometheus_client import Counter, Histogram, Gauge, Info
 import time
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # API request metrics
 REQUEST_COUNT = Counter(
@@ -59,31 +60,34 @@ API_INFO = Info(
     'Information about the Chat API'
 )
 
-class MetricsMiddleware:
-    async def __call__(self, request, call_next):
+class MetricsMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        # One-time setup can go here
+
+    async def dispatch(self, request, call_next):
         start_time = time.time()
-        
-        # Process the request
         response = await call_next(request)
-        
-        # Skip metrics for the metrics endpoint itself to avoid recursion
-        if not request.url.path == '/metrics':
+
+        # Skip metrics endpoint itself to avoid recursion
+        if request.url.path != "/metrics":
             # Record request latency
             REQUEST_LATENCY.labels(
                 method=request.method,
                 endpoint=request.url.path
             ).observe(time.time() - start_time)
-            
+
             # Count request
             REQUEST_COUNT.labels(
                 method=request.method,
                 endpoint=request.url.path,
                 status_code=response.status_code
             ).inc()
-        
+
         return response
 
-def setup_metrics(app_version):
+
+def setup_metrics(app_version: str):
     """Initialize metrics with application info"""
     API_INFO.info({
         'version': app_version,
