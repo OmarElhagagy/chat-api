@@ -1,0 +1,58 @@
+# Python-specific
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+*.env
+
+# Sensitive files
+.env.local
+.env.development
+.env.production
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Dependency directories (if accidentally created)
+node_modules/
+pip_cache/
+
+# Docker-specific (optional, if you regenerate these)
+docker-compose.override.yml
+
+# Testing and coverage
+.coverage
+coverage.xml
+*.cover
+*.pytest_cache/
+
+# Temporary files
+*.bak
+*.swp
+*~
+
+# Local database or cache data (if applicable)
+*.sqlite3
+*.db
+redis_data/
+postgres_data/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

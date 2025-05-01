@@ -1,0 +1,61 @@
+# Git-related
+.git
+.gitignore
+
+# Python-specific
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+*.env
+.env.local
+.env.development
+.env.production
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Local data
+redis_data/
+postgres_data/
+*.sqlite3
+*.db
+
+# Testing and coverage
+.coverage
+coverage.xml
+*.cover
+*.pytest_cache/
+
+# Temporary files
+*.bak
+*.swp
+*~
+
+# Documentation and non-essential files
+README.md
+LICENSE
+*.md
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Development-specific configs
+docker-compose.override.yml
